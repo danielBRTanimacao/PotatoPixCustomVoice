@@ -1,0 +1,148 @@
+# ========================
+#  PYTHON
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# pyenv
+.python-version
+
+# poetry
+.poetry/
+poetry.lock
+
+# PIPENV
+Pipfile
+Pipfile.lock
+
+# ========================
+#  DJANGO
+# ========================
+
+# SQLite database
+*.sqlite3
+db.sqlite3
+
+# Django migrations (opcional)
+# Remova o comentário caso NÃO queira versionar migrations
+# */migrations/
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Secret key local
+**/settings_local.py
+**/local_settings.py
+**/settings_dev.py
+
+# Media uploads
+media/
+MEDIA/
+*/media/
+
+# Django cache
+django_cache/
+cache/
+
+# Logs
+*.log
+logs/
+log/
+*/log/
+
+
+# ========================
+#  ENVIRONMENT VARIABLES
+# ========================
+*.env
+.env.*
+.*/**.env
+secrets/
+secret.key
+
+
+# ========================
+#  EDITORS & OS FILES
+# ========================
+
+# VSCode
+.vscode/
+.code-workspace
+
+# PyCharm / JetBrains
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ========================
+#  STATIC & BUILD FILES
+# ========================
+
+# Node (caso use tailwind, react, vite, etc)
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+*.tsbuildinfo
+
+# Static generated
+static/
+staticfiles/
+static_root/
+staticfiles_root/
+
+# Compressed
+*.gz
+*.zip
+*.tar
+*.rar
+
+
+# ========================
+#  PYTHON BYTECODE CACHE
+# ========================
+*.pyc
+*.pyo
+*.pyd
+
+
+# ========================
+#  DOCKER (se usar)
+# ========================
+docker-compose.override.yml
+.docker/
+docker-data/
+
+# ========================
+#  TESTS
+# ========================
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+nosetests.xml
+
