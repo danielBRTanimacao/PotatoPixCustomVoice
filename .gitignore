@@ -145,4 +145,3 @@ coverage.xml
 htmlcov/
 .pytest_cache/
 nosetests.xml
-
