@@ -1,21 +1,19 @@
 import os
 
-from ninja import NinjaAPI
-from ninja.responses import Response
-from ninja.errors import HttpError
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 from dotenv import load_dotenv
 
-api = NinjaAPI()
 load_dotenv()
 
 WEBHOOK_JAVA_SECRET = os.getenv('WEBHOOK_JAVA_SECRET')
-BACKEND_SECRET = os.getenv('BACKEND_SECRET') # passar o HEader depois
+BACKEND_SECRET = os.getenv('BACKEND_SECRET')
 
-@api.get('voices')
-def submit_voice(request, websecret: str):
-    if WEBHOOK_JAVA_SECRET != websecret:
-        print(WEBHOOK_JAVA_SECRET)
-        raise HttpError(401, "unauthorized websecret is invalid")
-    
-    return Response({'data': websecret})
+@api_view(["POST"])
+def submit_voice(request):
+    if WEBHOOK_JAVA_SECRET != request.GET.get('websecret') or BACKEND_SECRET != request.headers.get('x-backend-secret'):
+        return Response("unauthorized websecret or header is invalid", status=status.HTTP_401_UNAUTHORIZED)
+
+    return Response()

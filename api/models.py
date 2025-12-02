@@ -2,8 +2,8 @@ from django.db import models
 
 class CustomVoiceModel(models.Model):
     class Meta:
-        verbose_name = "Personal Voz Model"
-        verbose_name_plural = "Modelos de Voz Personalizadas"
+        verbose_name = "Custom Voice Model"
+        verbose_name_plural = "Custom Voice Models"
 
     def __str__(self):
         return self.name
