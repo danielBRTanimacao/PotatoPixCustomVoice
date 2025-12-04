@@ -3,5 +3,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('voices/webhook', views.submit_voice),
+    path('voices', views.list_all_voices),
 ]
