@@ -145,3 +145,6 @@ coverage.xml
 htmlcov/
 .pytest_cache/
 nosetests.xml
+
+voice_models
+sample_audios

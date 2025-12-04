@@ -8,11 +8,12 @@ import numpy
 BASE_DIR = Path(__file__).resolve().parent
 
 VOICE_DIR = BASE_DIR / 'voices'
-VOICE_FILE = VOICE_DIR / 'bobEsponja.wav'
+VOICE_FILE = VOICE_DIR / 'silvioSantos.wav'
+#VOICE_FILE = VOICE_DIR / 'bobEsponja.wav'
 OUTPUT_PATH = BASE_DIR / "output.mp3"
 
 LANG = 'pt'
-MSG = "Anonimo mandou 10 reais, iae meu amigo como vão as coisas?"
+MSG = "Use a minha voz para enviar essa mensagem!"
 DEVICE = 'cpu'
 
 if torch.cuda.is_available():
@@ -24,7 +25,7 @@ audio = tts.tts(
     text=MSG,
     speaker_wav=str(VOICE_FILE),
     language=LANG,
-    speed=1,
+    speed=1.0,
     enable_text_splitting=False,
     temperature=0.1, 
     gpt_cond_len=5,
