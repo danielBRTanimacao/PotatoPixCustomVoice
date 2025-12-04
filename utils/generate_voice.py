@@ -2,17 +2,17 @@ from pathlib import Path
 
 import torch
 from TTS.api import TTS
-from tempfile import NamedTemporaryFile
-import numpy
-import io
 import soundfile
+import numpy
 
 BASE_DIR = Path(__file__).resolve().parent
 
 VOICE_DIR = BASE_DIR / 'voices'
 VOICE_FILE = VOICE_DIR / 'bobEsponja.wav'
+OUTPUT_PATH = BASE_DIR / "output.mp3"
+
 LANG = 'pt'
-MSG = "Iae meu nobre, como vai?"
+MSG = "Anonimo mandou 10 reais, Iae meu amigo como vão as coisas?"
 DEVICE = 'cpu'
 
 if torch.cuda.is_available():
@@ -20,18 +20,14 @@ if torch.cuda.is_available():
 
 tts = TTS('tts_models/multilingual/multi-dataset/xtts_v2').to(DEVICE)
 
-with NamedTemporaryFile(dir=VOICE_DIR, suffix='.mp3') as voice:
-    voice.write(VOICE_FILE.file.read())
-    voice_path = voice.name
-    
-    speech_file = tts.tts(
-        text=MSG,
-        speaker_mp3=voice_path,
-        language=LANG
-    )
+audio = tts.tts(
+    text=MSG,
+    speaker_wav=str(VOICE_FILE),
+    language=LANG,
+    speed=1.0,
+    enable_text_splitting=True
+)
 
-audio_array = numpy.array(speech_file, dtype=numpy.float32)
+audio_array = numpy.array(audio, dtype=numpy.float32)
 
-audio_stream= io.BytesIO()
-soundfile.write(audio_stream, audio_array, samplerate=22050, format='mp3')
-audio_stream.seek(0)
+soundfile.write(OUTPUT_PATH, audio_array, samplerate=22050, format="mp3")
