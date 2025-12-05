@@ -1,8 +1,15 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
-@api_view(['GET'])
-def list_all_voices(request):
-    return Response({'data': 'data'})
+from .serializer import InCustomVoiceSerializer
+from api.models import CustomVoiceModel
 
-# create
+class ManagerCustomVoice(APIView):
+    def get(self, request, format=None):
+        voice_serializer = InCustomVoiceSerializer(data=request.data)
+        if voice_serializer.is_valid(raise_exception=True):
+            # generator
+            voice_serializer.save()
+            return Response(status.HTTP_201_CREATED)
+        return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
