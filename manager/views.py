@@ -1,4 +1,4 @@
-from django.shortcuts import get_list_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
@@ -29,6 +29,6 @@ class ManagerCustomVoice(APIView):
         return Response(voice_obj_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
      
     def delete(self, pk: int, request):
-        voice_obj = CustomVoiceModel.objects.get(pk=pk)
+        voice_obj = get_object_or_404(CustomVoiceModel.objects.get(pk=pk))
         voice_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

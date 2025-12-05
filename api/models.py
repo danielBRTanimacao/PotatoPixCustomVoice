@@ -18,8 +18,7 @@ class CustomVoiceModel(models.Model):
 
     sample_audio = models.FileField(
         upload_to='sample_audios/',
-        blank=True,
-        null=True,
+        null=False,
         verbose_name="Original audio sample",
         help_text="Reference audio (ogg/mp3) used to train or demonstration."
     )
