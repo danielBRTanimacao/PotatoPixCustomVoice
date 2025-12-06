@@ -20,7 +20,7 @@ class ManagerCustomVoice(APIView):
 
     def post(self, request, format=None):
         voice_serializer = InCustomVoiceSerializer(data=request.data)
-
+        # update some datas
         if voice_serializer.is_valid(raise_exception=True):
             voice_instance = voice_serializer.save(commit=False)
             reference_audio = request.data.get('sample_audio')
