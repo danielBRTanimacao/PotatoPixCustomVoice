@@ -8,7 +8,7 @@ import numpy
 BASE_DIR = Path(__file__).resolve().parent
 
 VOICE_DIR = BASE_DIR / 'voices'
-VOICE_FILE = VOICE_DIR / 'bobEsponja.wav'
+#VOICE_FILE = VOICE_DIR / 'bobEsponja.wav'
 VOICE_FILE = VOICE_DIR / 'silvioSantos.wav'
 
 def generate_voice(voice: str) -> None:
