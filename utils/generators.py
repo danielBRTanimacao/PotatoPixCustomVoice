@@ -1,19 +1,10 @@
-from pathlib import Path
-
 import torch
 from TTS.api import TTS
 import soundfile
+import tempfile
 import numpy
 
-BASE_DIR = Path(__file__).resolve().parent
-
-VOICE_DIR = BASE_DIR / 'voices'
-#VOICE_FILE = VOICE_DIR / 'bobEsponja.wav'
-VOICE_FILE = VOICE_DIR / 'silvioSantos.wav'
-
-def generate_voice(voice: str) -> None:
-    OUTPUT_PATH = BASE_DIR / "output.mp3"
-
+def generate_voice(voice: str) -> str:
     LANG = 'pt'
     MSG = "Use a minha voz para enviar essa mensagem!"
     DEVICE = 'cpu'
@@ -36,6 +27,8 @@ def generate_voice(voice: str) -> None:
 
     audio_array = numpy.array(audio, dtype=numpy.float32)
 
-    soundfile.write(OUTPUT_PATH, audio_array, samplerate=22050, format="mp3")
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp:
+        temp_path = temp.name
 
-generate_voice(VOICE_FILE)
+    soundfile.write(temp_path, audio_array, samplerate=22050, format="mp3")
+    return temp_path
