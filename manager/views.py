@@ -22,7 +22,6 @@ class ManagerCustomVoice(APIView):
         voice_serializer = InCustomVoiceSerializer(data=request.data)
         # update some datas
         if voice_serializer.is_valid(raise_exception=True):
-            voice_instance = voice_serializer.save(commit=False)
             reference_audio = request.data.get('sample_audio')
 
             if not reference_audio:
@@ -32,16 +31,16 @@ class ManagerCustomVoice(APIView):
             try:
                 with open(temp_audio, 'rb') as file:
                     audio_content = ContentFile(file.read())
-                    voice_instance.sample_audio.save(
+                    voice_serializer.sample_audio.save(
                         name=os.path.basename(temp_audio),
                         content=audio_content,
                         save=False
                     )
 
-                voice_instance.save()
+                voice_serializer.save()
                 return Response(status.HTTP_201_CREATED)
             except Exception as ex:
-                return Response({"detail": "Internal error cannot generate the audio"})
+                return Response({"detail": "Internal error cannot generate the audio " + ex})
             finally:
                 if os.path.exists(temp_audio):
                     os.remove(temp_audio)
