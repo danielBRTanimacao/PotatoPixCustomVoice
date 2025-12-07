@@ -4,31 +4,28 @@ import soundfile
 import tempfile
 import numpy
 
-def generate_voice(voice: str) -> str:
+def generate_voice(voice_file) -> str:
     LANG = 'pt'
     MSG = "Use a minha voz para enviar essa mensagem!"
-    DEVICE = 'cpu'
+    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    if torch.cuda.is_available():
-        DEVICE = 'cuda'
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_in:
+        for chunk in voice_file.chunks():
+            temp_in.write(chunk)
+        temp_in_path = temp_in.name
 
-    tts = TTS('tts_models/multilingual/multi-dataset/xtts_v2').to(DEVICE)
+    tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(DEVICE)
 
     audio = tts.tts(
         text=MSG,
-        speaker_wav=str(voice),
+        speaker_wav=temp_in_path,
         language=LANG,
         speed=1.0,
-        enable_text_splitting=False,
-        temperature=0.1, 
-        gpt_cond_len=5,
-        gpt_cond_chunk_len=5,
     )
 
     audio_array = numpy.array(audio, dtype=numpy.float32)
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp_out:
+        temp_out_path = temp_out.name
 
-    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp:
-        temp_path = temp.name
-
-    soundfile.write(temp_path, audio_array, samplerate=22050, format="mp3")
-    return temp_path
+    soundfile.write(temp_out_path, audio_array, samplerate=22050, format="mp3")
+    return temp_out_path
