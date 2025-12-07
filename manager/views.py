@@ -1,5 +1,6 @@
 import os
 
+from django.db import transaction
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.core.files.base import ContentFile
 
@@ -18,33 +19,39 @@ class ManagerCustomVoice(APIView):
         voice_serializer = ListCustomVoiceSerializer(voice_objs, many=True)
         return Response(voice_serializer.data)
 
+    @transaction.atomic
     def post(self, request, format=None):
         voice_serializer = InCustomVoiceSerializer(data=request.data)
-        # update some datas
+        temp_audio = None 
+
         if voice_serializer.is_valid(raise_exception=True):
             reference_audio = request.data.get('sample_audio')
 
             if not reference_audio:
-                return Response({"detail": "Path to audio reference is invalid"} ,status=status.HTTP_400_BAD_REQUEST)
-            
-            temp_audio = generate_voice(reference_audio)
+                return Response({"detail": "Path to audio reference is invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
             try:
+                temp_audio = generate_voice(reference_audio)
+
                 with open(temp_audio, 'rb') as file:
                     audio_content = ContentFile(file.read())
+
                     voice_serializer.sample_audio.save(
                         name=os.path.basename(temp_audio),
                         content=audio_content,
-                        save=False
+                        save=False 
                     )
-
                 voice_serializer.save()
+                
                 return Response(status.HTTP_201_CREATED)
+                
             except Exception as ex:
-                return Response({"detail": "Internal error cannot generate the audio " + ex})
+                return Response({"detail": f"Internal error cannot generate or save the audio: {ex}"}, 
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
             finally:
-                if os.path.exists(temp_audio):
+                if temp_audio and os.path.exists(temp_audio):
                     os.remove(temp_audio)
-
         return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
