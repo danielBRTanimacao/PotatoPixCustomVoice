@@ -24,9 +24,9 @@ class ManagerCustomVoice(APIView):
         voice_serializer = InCustomVoiceSerializer(data=request.data)
 
         if voice_serializer.is_valid(raise_exception=True):
-            voice_serializer.voice_model_file = generate_voice(request.data.get('sample_audio'))
-            voice_serializer.save()
-        
+            generated_file = generate_voice(request.data.get('sample_audio'))
+            voice_instance = voice_serializer.save(voice_model_file=generated_file)
+            return Response(InCustomVoiceSerializer(voice_instance).data, status=status.HTTP_201_CREATED)
         return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
