@@ -22,36 +22,11 @@ class ManagerCustomVoice(APIView):
     @transaction.atomic
     def post(self, request, format=None):
         voice_serializer = InCustomVoiceSerializer(data=request.data)
-        temp_audio = None 
 
         if voice_serializer.is_valid(raise_exception=True):
-            reference_audio = request.data.get('sample_audio')
-
-            if not reference_audio:
-                return Response({"detail": "Path to audio reference is invalid"}, status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                temp_audio = generate_voice(reference_audio)
-
-                with open(temp_audio, 'rb') as file:
-                    audio_content = ContentFile(file.read())
-
-                    voice_serializer.sample_audio.save(
-                        name=os.path.basename(temp_audio),
-                        content=audio_content,
-                        save=False 
-                    )
-                voice_serializer.save()
-                
-                return Response(status.HTTP_201_CREATED)
-                
-            except Exception as ex:
-                return Response({"detail": f"Internal error cannot generate or save the audio: {ex}"}, 
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-            finally:
-                if temp_audio and os.path.exists(temp_audio):
-                    os.remove(temp_audio)
+            voice_serializer.voice_model_file = generate_voice(request.data.get('sample_audio'))
+            voice_serializer.save()
+        
         return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
