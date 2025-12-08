@@ -32,6 +32,7 @@ class ManagerCustomVoice(APIView):
     def put(self, request, pk: int):
         voice_obj = get_object_or_404(CustomVoiceModel, pk=pk)
         voice_obj_serializer = InCustomVoiceSerializer(voice_obj, data=request.data)
+        
         if voice_obj_serializer.is_valid(raise_exception=True):
             generated_file = generate_voice(request.data.get('sample_audio'))
             voice_obj_serializer.save(voice_model_file=generated_file)
