@@ -24,8 +24,8 @@ def generate_voice(voice_file) -> str:
     )
 
     audio_array = numpy.array(audio, dtype=numpy.float32)
-    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp_out:
+    with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as temp_out:
         temp_out_path = temp_out.name
 
-    soundfile.write(temp_out_path, audio_array, samplerate=22050, format="mp3")
+    soundfile.write(temp_out_path, audio_array, samplerate=22050, format="ogg")
     return temp_out_path

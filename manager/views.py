@@ -29,14 +29,14 @@ class ManagerCustomVoice(APIView):
             return Response(InCustomVoiceSerializer(voice_instance).data, status=status.HTTP_201_CREATED)
         return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk):
+    def put(self, request, pk: int):
         voice_obj = CustomVoiceModel.objects.get(pk=pk)
         voice_obj_serializer = InCustomVoiceSerializer(voice_obj, data=request.data)
         if voice_obj_serializer.is_valid(raise_exception=True):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(voice_obj_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
      
-    def delete(self, pk: int, request):
-        voice_obj = get_object_or_404(CustomVoiceModel.objects.get(pk=pk))
+    def delete(self, request, pk: int):
+        voice_obj = get_object_or_404(CustomVoiceModel, pk=pk)
         voice_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
