@@ -30,9 +30,11 @@ class ManagerCustomVoice(APIView):
         return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk: int):
-        voice_obj = CustomVoiceModel.objects.get(pk=pk)
+        voice_obj = get_object_or_404(CustomVoiceModel, pk=pk)
         voice_obj_serializer = InCustomVoiceSerializer(voice_obj, data=request.data)
         if voice_obj_serializer.is_valid(raise_exception=True):
+            generated_file = generate_voice(request.data.get('sample_audio'))
+            voice_obj_serializer.save(voice_model_file=generated_file)
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(voice_obj_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
      
