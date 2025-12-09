@@ -7,11 +7,26 @@ class CustomVoiceModel(models.Model):
 
     def __str__(self):
         return self.name
+    
+    STATUS_CHOICES = [
+        ('PENDING', 'Processamento Pendente'),
+        ('COMPLETED', 'Concluído'),
+        ('FAILED', 'Falha no Processamento'),
+    ]
 
     name = models.CharField(max_length=100, unique=True)
+
+    status = models.CharField(
+        max_length=10, 
+        choices=STATUS_CHOICES, 
+        default='PENDING', 
+        verbose_name="Status de Processamento"
+    )
     
     voice_model_file = models.FileField(
         upload_to='voice_models/',
+        blank=True,
+        null=True,
         verbose_name="Model Voz file (IA)",
         help_text="The file is binary and permanent, model Ia learned (.pth, .pt, .zip)"
     )
