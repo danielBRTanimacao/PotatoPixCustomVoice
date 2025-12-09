@@ -16,7 +16,7 @@ def load_tts_model():
     global TTS_MODEL_INSTANCE
     if TTS_MODEL_INSTANCE is None:
         DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-        print(f"Carregando modelo XTTS-v2 no dispositivo: {DEVICE}")
+        print(f"Loaging model XTTS-v2 on device: {DEVICE}")
         TTS_MODEL_INSTANCE = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(DEVICE)
     return TTS_MODEL_INSTANCE
 
@@ -60,13 +60,13 @@ def process_voice_generation(voice_instance_id: int, sample_audio_content: bytes
         voice_instance.save()
 
     except Exception as e:
-        print(f"Erro na geração de voz para a instância {voice_instance_id}: {e}")
+        print(f"Err generating voice to instance {voice_instance_id}: {e}")
         try:
              voice_instance = CustomVoiceModel.objects.get(pk=voice_instance_id)
              voice_instance.status = 'FAILED'
              voice_instance.save()
         except Exception as update_err:
-             print(f"Erro ao atualizar status para FAILED: {update_err}")
+             print(f"Err updating status to FAILED: {update_err}")
 
     finally:
         if temp_in_path and os.path.exists(temp_in_path):

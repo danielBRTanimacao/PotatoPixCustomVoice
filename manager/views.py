@@ -11,7 +11,6 @@ from rest_framework import status
 from .serializer import InCustomVoiceSerializer, ListCustomVoiceSerializer
 from api.models import CustomVoiceModel
 
-from utils.generators import generate_voice
 from .task import process_voice_generation
 
 class ManagerCustomVoice(APIView):
@@ -45,14 +44,37 @@ class ManagerCustomVoice(APIView):
             )
         return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @transaction.atomic
     def put(self, request, pk: int):
         voice_obj = get_object_or_404(CustomVoiceModel, pk=pk)
-        voice_obj_serializer = InCustomVoiceSerializer(voice_obj, data=request.data)
+        voice_obj_serializer = InCustomVoiceSerializer(voice_obj, data=request.data, partial=True)
         
         if voice_obj_serializer.is_valid(raise_exception=True):
-            generated_file = generate_voice(request.data.get('sample_audio'))
-            voice_obj_serializer.save(voice_model_file=generated_file)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            sample_audio_file = request.data.get('sample_audio')
+            
+            if sample_audio_file:
+                voice_instance = voice_obj_serializer.save(
+                    voice_model_file=None,
+                    status='PENDING'
+                )
+
+                sample_audio_content = sample_audio_file.read()
+                file_name = sample_audio_file.name
+
+                process_voice_generation.delay(
+                    voice_instance.id, 
+                    sample_audio_content, 
+                    file_name
+                )
+
+                return Response(
+                    InCustomVoiceSerializer(voice_instance).data,
+                    status=status.HTTP_202_ACCEPTED 
+                )
+            else:
+                voice_obj_serializer.save()
+                return Response(status=status.HTTP_200_OK)
+                
         return Response(voice_obj_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
      
     def delete(self, request, pk: int):
