@@ -12,6 +12,7 @@ from .serializer import InCustomVoiceSerializer, ListCustomVoiceSerializer
 from api.models import CustomVoiceModel
 
 from utils.generators import generate_voice
+from .task import process_voice_generation
 
 class ManagerCustomVoice(APIView):
     def get(self, request, format=None):
@@ -24,9 +25,24 @@ class ManagerCustomVoice(APIView):
         voice_serializer = InCustomVoiceSerializer(data=request.data)
 
         if voice_serializer.is_valid(raise_exception=True):
-            generated_file = generate_voice(request.data.get('sample_audio'))
-            voice_instance = voice_serializer.save(voice_model_file=generated_file)
-            return Response(InCustomVoiceSerializer(voice_instance).data, status=status.HTTP_201_CREATED)
+            voice_instance = voice_serializer.save(
+                voice_model_file=None,
+                status='PENDING'
+            )
+
+            sample_audio_file = request.data.get('sample_audio')
+            sample_audio_content = sample_audio_file.read()
+            file_name = sample_audio_file.name
+
+            process_voice_generation.delay(
+                voice_instance.id, 
+                sample_audio_content, 
+                file_name
+            )
+            return Response(
+                InCustomVoiceSerializer(voice_instance).data, 
+                status=status.HTTP_202_ACCEPTED 
+            )
         return Response(voice_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk: int):
