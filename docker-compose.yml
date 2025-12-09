@@ -1,0 +1,13 @@
+services:
+    redis:
+        image: redis:7
+        ports:
+            - "6379:6379"
+
+    celery:
+        build: .
+        command: celery -A core worker -l info
+        volumes:
+            - .:/app
+        depends_on:
+            - redis
